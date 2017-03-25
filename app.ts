@@ -9,6 +9,8 @@ import * as routes from "./routes/index";
 
 let app = express();
 
+app.use(express.static('./static'));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(morgan('dev'));
