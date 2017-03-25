@@ -1,0 +1,17 @@
+{
+  "name": "lnlyppl",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Ben Romano <bromano2100@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/aws-sdk": "^0.0.42",
+    "@types/body-parser": "^1.16.1",
+    "@types/express": "^4.0.35",
+    "@types/morgan": "^1.7.32",
+    "aws-sdk": "^2.32.0",
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "morgan": "^1.8.1"
+  }
+}
