@@ -55,13 +55,33 @@ router.post('/sendtext', (req: express.Request, res: express.Response) => {
     res.sendStatus(200);
 });
 
+interface SadFaceRequest {
+  time: string;
+  name: string;
+  phoneNumber: string;
+  image: string;
+}
+
 router.post('/processface', (req: express.Request, res: express.Response) => {
+
+  if (!req.body ||
+      !req.body.time ||
+      !req.body.name ||
+      !req.body.phoneNumber ||
+      req.body.phoneNumber.length != 12 ||
+      !req.body.image) {
+      res.sendStatus(400);
+      return;
+  }
+
+  let sadFaceRequest: SadFaceRequest = req.body;
+
   var imageKey: string = uuid.v4();
 
   var s3Params: AWS.S3.PutObjectRequest = {
     Bucket: "lnlypplphotos",
     Key: imageKey,
-    Body: req.body.image
+    Body: sadFaceRequest.image
   }
 
   s3.upload(s3Params, (err, data) => {
@@ -118,6 +138,26 @@ router.post('/processface', (req: express.Request, res: express.Response) => {
 
       sendText = sendText || sad || angry || confused || disgusted;
     }
+
+    let message = "";
+
+    // TODO: Add message choice variations
+    message = `A photo of your friend, ${sadFaceRequest.name}, taken at ${sadFaceRequest.time} showed him looking unhappy... You should hit 'em up!`;
+
+    let params: AWS.SNS.PublishInput = {
+        Message: message,
+        PhoneNumber: sadFaceRequest.phoneNumber
+    };
+
+    sns.publish(params, (err, data) => {
+        if (err) {
+            console.log(err, err.stack);
+            res.sendStatus(500);
+            return;
+        } else {
+            console.log(data);
+        }
+    });
 
     res.sendStatus(200);
   });
