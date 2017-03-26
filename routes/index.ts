@@ -62,7 +62,6 @@ router.post('/sendtext', (req: express.Request, res: express.Response) => {
 });
 
 interface SadFaceRequest {
-  time: string;
   name: string;
   phoneNumber: string;
   image: string;
@@ -71,39 +70,20 @@ interface SadFaceRequest {
 router.post('/processface', (req: express.Request, res: express.Response) => {
 
   if (!req.body ||
-      !req.body.time ||
       !req.body.name ||
       !req.body.phoneNumber ||
       req.body.phoneNumber.length != 12 ||
       !req.body.image) {
-      res.sendStatus(400);
-      return;
+        console.log(req.body);
+        res.sendStatus(400);
+        return;
   }
 
   let sadFaceRequest: SadFaceRequest = req.body;
 
-  var imageKey: string = uuid.v4();
-
-  var s3Params: AWS.S3.PutObjectRequest = {
-    Bucket: "lnlypplphotos",
-    Key: imageKey,
-    Body: sadFaceRequest.image
-  }
-
-  s3.upload(s3Params, (err, data) => {
-    if (err != null) {
-      res.sendStatus(500);
-      console.log(err);
-      return;
-    }
-  })
-
   var rekognitionParams: AWS.Rekognition.DetectFacesRequest = {
     Image: {
-      S3Object: {
-        Bucket: 'lnlypplphotos',
-        Name: imageKey
-      }
+      Bytes: new Buffer(sadFaceRequest.image, 'base64')
     },
     Attributes: [
       'ALL'
@@ -137,33 +117,35 @@ router.post('/processface', (req: express.Request, res: express.Response) => {
       var calm: boolean = checkEmotion("CALM");
 
       if (face.Smile.Value == false && face.Smile.Confidence > confidenceThreshold) {
-        if (!calm) {
-          sendText = true;
-        }
+        sendText = sendText || !calm;
       }
 
       sendText = sendText || sad || angry || confused || disgusted;
     }
 
+    console.log(JSON.stringify(data.FaceDetails));
+
     let message = "";
 
     // TODO: Add message choice variations
-    message = `A photo of your friend, ${sadFaceRequest.name}, taken at ${sadFaceRequest.time} showed him looking unhappy... You should hit 'em up!`;
+    message = `A photo of your friend, ${sadFaceRequest.name}, we just took showed him looking unhappy... You should hit 'em up!`;
 
     let params: AWS.SNS.PublishInput = {
         Message: message,
         PhoneNumber: sadFaceRequest.phoneNumber
     };
 
-    sns.publish(params, (err, data) => {
-        if (err) {
+    if (sendText) {
+      sns.publish(params, (err, data) => {
+          if (err) {
             console.log(err, err.stack);
             res.sendStatus(500);
             return;
-        } else {
+          } else {
             console.log(data);
-        }
-    });
+          }
+      });
+    }
 
     res.sendStatus(200);
   });

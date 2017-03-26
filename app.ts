@@ -11,8 +11,8 @@ let app = express();
 
 app.use(express.static('./static'));
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
+app.use(bodyParser.json({ limit: '5mb' }));
 app.use(morgan('dev'));
 
 var env = process.env.NODE_ENV || 'development';
