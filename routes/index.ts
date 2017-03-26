@@ -138,7 +138,7 @@ router.post('/processface', (req: express.Request, res: express.Response) => {
     let message = "";
 
     // TODO: Add message choice variations
-    message = `A photo of your friend, ${sadFaceRequest.name}, we just took showed him looking unhappy... You should hit 'em up!`;
+    message = `A photo of your friend, ${sadFaceRequest.name}, we just took showed them looking unhappy... You should hit 'em up!`;
 
     let params: AWS.SNS.PublishInput = {
         Message: message,
