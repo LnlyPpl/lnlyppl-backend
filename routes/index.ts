@@ -98,7 +98,7 @@ router.post('/processface', (req: express.Request, res: express.Response) => {
 
     var sendText = false;
 
-    const confidenceThreshold: number = 0.75;
+    const confidenceThreshold: number = 75;
 
     for (var i = 0; i < data.FaceDetails.length; i++) {
       var face: AWS.Rekognition.FaceDetail = data.FaceDetails[i];
@@ -107,9 +107,10 @@ router.post('/processface', (req: express.Request, res: express.Response) => {
 
       var checkEmotion = (emotion: string) => {
         var index = emotionTypes.indexOf(emotion);
-        return index == -1 || face.Emotions[index].Confidence > confidenceThreshold;
+        return index != -1 && face.Emotions[index].Confidence > confidenceThreshold;
       };
 
+      var happy: boolean = checkEmotion("HAPPY");
       var sad: boolean = checkEmotion("SAD");
       var angry: boolean = checkEmotion("ANGRY");
       var confused: boolean = checkEmotion("CONFUSED");
@@ -117,10 +118,10 @@ router.post('/processface', (req: express.Request, res: express.Response) => {
       var calm: boolean = checkEmotion("CALM");
 
       if (face.Smile.Value == false && face.Smile.Confidence > confidenceThreshold) {
-        sendText = sendText || !calm;
+        sendText = sendText || !(calm || happy);
       }
 
-      sendText = sendText || sad || angry || confused || disgusted;
+      sendText = sendText || (!happy && (sad || angry || confused || disgusted));
     }
 
     console.log(JSON.stringify(data.FaceDetails));
