@@ -17,6 +17,11 @@ interface SendTextRequest {
     phoneNumber: string;
 }
 
+function badTime(time: string): boolean {
+  let splitTime: string[] = time.split(" ");
+  return splitTime[0] === "0h" && splitTime[1] == "0m";
+}
+
 router.post('/sendtext', (req: express.Request, res: express.Response) => {
 
     console.log(req.body);
@@ -25,6 +30,7 @@ router.post('/sendtext', (req: express.Request, res: express.Response) => {
         typeof req.body.messageChoice !== "number"||
         !req.body.website ||
         !req.body.time ||
+        badTime(req.body.time) ||
         !req.body.name ||
         !req.body.phoneNumber ||
         req.body.phoneNumber.length != 12) {
