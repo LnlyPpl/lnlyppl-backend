@@ -42,8 +42,17 @@ router.post('/sendtext', (req: express.Request, res: express.Response) => {
 
     let message = "";
 
-    // TODO: Add message choice variations
-    message = `Your friend, ${sendTextRequest.name}, has spent ${sendTextRequest.time} on ${sendTextRequest.website}... You should hit 'em up!`;
+    if (req.body.messageChoice === 2) {
+	    message = `${sendTextRequest.name} has been on ${sendTextRequest.website} for a while, consider shooting them a text.`;
+    } else if (req.body.messageChoice === 3) {
+	    message = `Have you spoken with ${sendTextRequest.name} recently? They seem lonely.`;
+    } else if (req.body.messageChoice === 4) {
+	    message = `Drag ${sendTextRequest.name} away from ${sendTextRequest.website}. They've been on there for ${sendTextRequest.time}!`;
+    } else if (req.body.messageChoice === 5) {
+	    message = `${sendTextRequest.time} is how long ${sendTextRequest.name} has been on ${sendTextRequest.website}. They could use some attention.`;
+    } else {
+        message = `Your friend, ${sendTextRequest.name}, has spent ${sendTextRequest.time} on ${sendTextRequest.website}... You should hit 'em up!`;
+    }
 
     let params: AWS.SNS.PublishInput = {
         Message: message,
