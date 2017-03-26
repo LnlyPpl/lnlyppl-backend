@@ -4,7 +4,7 @@ import * as uuid from "uuid";
 
 let router = express.Router();
 
-AWS.config.update({region: 'us-east-1'});
+AWS.config.update({region: 'us-east-2'});
 let sns = new AWS.SNS();
 let rekognition = new AWS.Rekognition({apiVersion: '2016-06-27'});
 let s3 = new AWS.S3();
