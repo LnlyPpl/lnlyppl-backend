@@ -122,7 +122,6 @@ router.post('/processface', (req: express.Request, res: express.Response) => {
       var happy: boolean = checkEmotion("HAPPY");
       var sad: boolean = checkEmotion("SAD");
       var angry: boolean = checkEmotion("ANGRY");
-      var confused: boolean = checkEmotion("CONFUSED");
       var disgusted: boolean = checkEmotion("DISGUSTED");
       var calm: boolean = checkEmotion("CALM");
 
@@ -130,7 +129,7 @@ router.post('/processface', (req: express.Request, res: express.Response) => {
         sendText = sendText || !(calm || happy);
       }
 
-      sendText = sendText || (!happy && (sad || angry || confused || disgusted));
+      sendText = sendText || (!happy && (sad || angry || disgusted));
     }
 
     console.log(JSON.stringify(data.FaceDetails));
