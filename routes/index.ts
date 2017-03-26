@@ -157,7 +157,11 @@ router.post('/processface', (req: express.Request, res: express.Response) => {
       });
     }
 
-    res.sendStatus(200);
+    if (data.FaceDetails.length == 0) {
+      res.sendStatus(500);
+    } else {
+      res.send(data.FaceDetails[0].Emotions[0].Type);
+    }
   });
 });
 
